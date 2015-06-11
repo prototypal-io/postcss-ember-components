@@ -1,0 +1,29 @@
+{
+  "name": "postcss-ember-components",
+  "version": "0.0.0",
+  "description": "PostCSS plugin that transforms CSS into GUID-based classes for componentized CSS.",
+  "keywords": [
+    "postcss",
+    "css",
+    "postcss-plugin",
+    "ember"
+  ],
+  "author": "James Fickel <jamesfickel@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JFickel/postcss-ember-components.git"
+  },
+  "dependencies": {
+    "postcss": "^4.1.9"
+  },
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^0.12.0",
+    "gulp-mocha": "^2.0.1"
+  },
+  "scripts": {
+    "test": "gulp"
+  }
+}
