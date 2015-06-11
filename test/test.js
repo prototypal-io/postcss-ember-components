@@ -15,6 +15,8 @@ var test = function (input, output, opts, done) {
 
 describe('postcss-ember-components', function () {
   it('outputs correct output with dummy uuid', function (done) {
-    test('.foo { color: red; } .bar { color: blue; }', '.my-component-abc123-foo { color: red; } .my-component-abc123-bar { color: blue; }', { fileName: 'my-component' }, done);
+    test(':--component { color: green; } .foo { color: red; } .bar { color: blue; }',
+         '.my-component-abc123 { color: green; } .my-component-abc123-foo { color: red; } .my-component-abc123-bar { color: blue; }',
+         { fileName: 'my-component' }, done);
   });
 });

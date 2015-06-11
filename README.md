@@ -1,20 +1,36 @@
 # PostCSS Ember Components [![Build Status][ci-img]][ci]
 
-[PostCSS] plugin that transforms CSS into GUID-based classes for componentized CSS..
+[PostCSS] plugin that transforms CSS into UUID-based classes for componentized CSS.
 
 [PostCSS]: https://github.com/postcss/postcss
 [ci-img]:  https://travis-ci.org/JFickel/postcss-ember-components.svg
 [ci]:      https://travis-ci.org/JFickel/postcss-ember-components
 
 ```css
+:--component {
+  font-size: var(--font-size, 10px);
+}
+
 .foo {
-    /* Input example */
+  --font-size: 12px;
+}
+
+.bar {
+  color: red;
 }
 ```
 
 ```css
-.foo {
-  /* Output example */
+.my-component-abc123 {
+  font-size: var(--font-size, 10px);
+}
+
+.my-component-abc123-foo {
+  --font-size: 12px;
+}
+
+.my-component-abc123-bar {
+  color: red;
 }
 ```
 
