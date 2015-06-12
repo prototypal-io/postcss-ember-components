@@ -8,15 +8,18 @@ module.exports = postcss.plugin('postcss-ember-components', function (opts) {
     var dummyUUID = "abc123";
     css.eachRule(function(rule) {
       // swap dummyUUID with uuid
-      var result = "." + opts.fileName + "-" + dummyUUID,
-          appendedSelector;
-      if (rule.selector !== ":--component" && rule.selector[0] === ".") {
-        appendedSelector = rule.selector.slice(1);
-        result += "-" + appendedSelector;
-      }
-      rule.selector = result;
-    });
+      var selectorCollection = rule.selector.split(" ").map(function(selector) {
+        var result = "." + opts.fileName + "-" + dummyUUID,
+            appendedSelector;
+        if (selector !== ":--component" && rule.selector[0] === ".") {
+          appendedSelector = selector.slice(1);
+          result += "-" + appendedSelector;
+        }
+        return result;
+      });
 
+      rule.selector = selectorCollection.join(" ");
+    });
     return css;
   };
 });
