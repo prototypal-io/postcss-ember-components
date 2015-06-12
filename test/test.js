@@ -3,7 +3,7 @@ var expect  = require('chai').expect;
 
 var plugin = require('../');
 
-var test = function (input, output, opts, done) {
+var equalityTest = function (input, output, opts, done) {
   postcss([ plugin(opts) ]).process(input, { from: 'some/file/path/my-component.css' }).then(function (result) {
     expect(result.css).to.eql(output);
     expect(result.warnings()).to.be.empty;
@@ -13,30 +13,37 @@ var test = function (input, output, opts, done) {
   });
 };
 
+var matchTest = function (input, output, opts, done) {
+  postcss([ plugin(opts) ]).process(input, { from: 'some/file/path/my-component.css' }).then(function (result) {
+    expect(result.css).to.match(output);
+    expect(result.warnings()).to.be.empty;
+    done();
+  }).catch(function (error) {
+    done(error);
+  });
+};
+
 describe('postcss-ember-components', function () {
-  it('handles basic conversion with simple classes and :--component', function (done) {
-    test(':--component { color: green; } .foo { color: red; } .bar { color: blue; }',
-         '.my-component-abc123 { color: green; } .my-component-abc123-foo { color: red; } .my-component-abc123-bar { color: blue; }',
+  it('handles basic conversion with simple classes and :--component', function(done) {
+    matchTest(':--component { color: green; } .foo { color: red; } .bar { color: blue; }',
+         /.my-component-\w{8} { color: green; } .my-component-\w{8}-foo { color: red; } .my-component-\w{8}-bar { color: blue; }/,
          { }, done);
   });
 
-  it('handles conversion with descendant classes', function (done) {
-    test('.foo .bar { color: orange; }',
-         '.my-component-abc123-foo .my-component-abc123-bar { color: orange; }',
+  it('handles conversion with multiple classes', function(done) {
+    matchTest('.foo, .bar { color: orange; }',
+         /.my-component-\w{8}-foo, .my-component-\w{8}-bar { color: orange; }/,
          { }, done);
+  });
+
+  it('returns the correct lookup object', function(done) {
+    var input = '.foo { color: pink; } .bar { color: black; }';
+    postcss([ plugin({}) ]).process(input, { from: 'some/file/path/my-component.css' }).then(function (result) {
+      expect(result.messages[0].lookupObject['my-component']['.foo']).to.match(/.my-component-\w{8}-foo/);
+      expect(result.messages[0].lookupObject['my-component']['.bar']).to.match(/.my-component-\w{8}-bar/);
+      done();
+    }).catch(function (error) {
+      done(error);
+    });
   });
 });
-
-// var postcss = require('postcss');
-// var allComponentCSS;
-//
-// someLoopForComponentCSSFiles(function(fileName) {
-//   postcss([ require('postcss-ember-components')({ fileName: fileName }) ])
-//     .process(css, { from: fileName })
-//     .then(function (result) {
-//       allComponentCSS += result.css;
-//   });
-// });
-//
-// var lookupTableJSON = convertAllComponentCSSToJSON(allComponentCSS);
-// fs.writeFileSync('some.lookup.table', result.css);
