@@ -5,15 +5,15 @@ module.exports = postcss.plugin('postcss-ember-components', function (opts) {
   opts = opts || {};
 
   return function (css, result) {
-    var guid = generateGUID();
+    var guid = opts.guid || generateGUID();
     var fileName = path.basename(css.source.input.from, '.css');
 
     var lookupObject = {};
     lookupObject[fileName] = {};
 
     css.eachRule(function(rule) {
-      var selectorCollection = rule.selector.split(",").map(function(selector) {
-        var selector = selector.trim();
+      var selectorCollection = rule.selector.split(",").map(function(sel) {
+        var selector = sel.trim();
         var newSelector = "." + fileName + "-" + guid,
             appendedSelector;
         if (selector !== ":--component" && rule.selector[0] === ".") {
@@ -32,7 +32,7 @@ module.exports = postcss.plugin('postcss-ember-components', function (opts) {
     result.messages.push({
       type: 'lookup-object',
       plugin: 'postcss-ember-components',
-      lookupObject: lookupObject
+      data: lookupObject
     });
     return css;
   };
