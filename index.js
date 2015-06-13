@@ -14,9 +14,10 @@ module.exports = postcss.plugin('postcss-ember-components', function (opts) {
     css.eachRule(function(rule) {
       var selectorCollection = rule.selector.split(",").map(function(sel) {
         var selector = sel.trim();
+        if (selector[0] !== "." && selector !== ":--component") { return selector; }
         var newSelector = "." + fileName + "-" + guid,
             appendedSelector;
-        if (selector !== ":--component" && rule.selector[0] === ".") {
+        if (selector !== ":--component") {
           appendedSelector = selector.slice(1);
           newSelector += "-" + appendedSelector;
         }

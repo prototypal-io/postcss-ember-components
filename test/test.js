@@ -74,4 +74,22 @@ describe('postcss-ember-components', function () {
       done(error);
     });
   });
+
+  it('handles non-class selectors correctly', function(done) {
+    equalityTest(':root {' +
+                   'color: green;' +
+                 '}' +
+                 'h1 {' +
+                   'color: blue;' +
+                 '}',
+
+                 ':root {' +
+                   'color: green;' +
+                 '}' +
+                 'h1 {' +
+                   'color: blue;' +
+                 '}',
+
+                 { guid: 'abc123' }, done);
+  });
 });
