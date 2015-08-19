@@ -64,7 +64,10 @@ describe('postcss-ember-components', function () {
     var input = '.foo { color: pink; } .bar { color: black; }';
     postcss([ plugin({ guid: 'abc123' }) ]).process(input, { from: 'some/file/path/my-component.css' }).then(function (result) {
       expect(result.messages[0].data).to.deep.equal({
-        'my-component': {
+        guid: 'abc123',
+        name: 'my-component',
+        prefix: 'my-component-abc123',
+        selectorMap: {
           '.foo': '.my-component-abc123-foo',
           '.bar': '.my-component-abc123-bar'
         }
