@@ -48,7 +48,7 @@ module.exports = postcss.plugin('postcss-ember-components', function (opts) {
 
 function getGUIDFn(opts) {
   if (!opts.guid) {
-    return defaultGUID;
+    return generateGUID;
   }
   if (typeof opts.guid === 'function') {
     return opts.guid;
@@ -59,22 +59,22 @@ function getGUIDFn(opts) {
 }
 
 function getNameFn(opts) {
-  return opts.name || defaultName;
+  return opts.name || generateName;
 }
 
 function getPrefixFn(opts) {
-  return opts.prefix || defaultPrefix;
+  return opts.prefix || generatePrefix;
 }
 
-function defaultGUID(n) {
+function generateGUID(n) {
   return n ? (n ^ Math.random() * 16 >> n/4).toString(16) : ('10000000'.replace(/[018]/g, generateGUID));
 }
 
-function defaultName(fileName) {
+function generateName(fileName) {
   return path.basename(fileName, '.css');
 }
 
-function defaultPrefix(name, guid) {
+function generatePrefix(name, guid) {
   return name + "-" + guid;
 }
 

@@ -13,17 +13,21 @@ var equalityTest = function (input, output, opts, done) {
   });
 };
 
-var matchTest = function (input, output, opts, done) {
-  postcss([ plugin(opts) ]).process(input, { from: 'some/file/path/my-component.css' }).then(function (result) {
-    expect(result.css).to.match(output);
-    expect(result.warnings()).to.be.empty;
-    done();
-  }).catch(function (error) {
-    done(error);
+describe('postcss-ember-components', function() {
+  it('defaults opts works', function(done) {
+    postcss([ plugin() ]).process(
+      '.foo { color: red }',
+      { from: 'some/file/path/my-component.css' }
+    ).then(function(result) {
+      var data = result.messages[0].data;
+      expect(data.selectorMap['.foo']).to.equal('.'+data.prefix+'-foo');
+      expect(result.css).to.equal('.'+data.prefix+'-foo { color: red }');
+      done();
+    }).catch(function (error) {
+      done(error);
+    });
   });
-};
 
-describe('postcss-ember-components', function () {
   it('handles basic conversion with simple classes and :--component', function(done) {
     equalityTest(':--component {' +
                    'color: green;' +
