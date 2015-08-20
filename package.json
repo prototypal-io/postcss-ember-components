@@ -21,7 +21,8 @@
     "chai": "^2.3.0",
     "gulp": "^3.9.0",
     "gulp-eslint": "^0.12.0",
-    "gulp-mocha": "^2.0.1"
+    "gulp-mocha": "^2.0.1",
+    "postcss-selector-parser": "^1.1.4"
   },
   "scripts": {
     "test": "gulp"
