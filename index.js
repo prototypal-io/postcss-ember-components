@@ -1,4 +1,5 @@
 var postcss = require('postcss');
+var parser = require('postcss-selector-parser');
 var path = require('path');
 
 module.exports = postcss.plugin('postcss-ember-components', function (opts) {
@@ -8,39 +9,38 @@ module.exports = postcss.plugin('postcss-ember-components', function (opts) {
   var prefixFn = getPrefixFn(opts);
 
   return function (css, result) {
-    var guid   = guidFn();
-    var name   = nameFn(css.source.input.from);
-    var prefix = prefixFn(name, guid);
+    var name = nameFn(css.source.input.from);
+    var guid = guidFn();
 
-    var selectorMap = {};
-    var data = {
+    var metadata = {
       name: name,
-      guid: guid,
-      prefix: prefix,
-      selectorMap: selectorMap
+      componentClass: prefixFn(name, guid),
+      classes: {}
     };
 
-    css.eachRule(function(rule) {
-      var selectorCollection = rule.selector.split(",").map(function(sel) {
-        var selector = sel.trim();
-        if (selector[0] !== "." && selector !== ":--component") { return selector; }
-        var newSelector = "." + prefix;
-        if (selector !== ":--component") {
-          newSelector += "-" + selector.slice(1);
+    function transform(selectors) {
+      selectors.eachInside(function (selector) {
+        var oldValue, newValue;
+        if (selector.type === 'pseudo' && selector.value === ':--component') {
+          selector.replaceWith(parser.className({
+            value: metadata.componentClass
+          }));
+        } else if (selector.type === 'class') {
+          oldValue = selector.value;
+          newValue = prefixFn(name, guid, oldValue);
+          selector.value = newValue;
+          metadata.classes[oldValue] = newValue;
         }
-
-        selectorMap[selector] = newSelector;
-
-        return newSelector;
       });
-
-      rule.selector = selectorCollection.join(", ");
+    }
+    css.eachRule(function(rule) {
+      rule.selector = parser(transform).process(rule.selector).result;
     });
 
     result.messages.push({
-      type: 'lookup-object',
+      type: 'component-classes',
       plugin: 'postcss-ember-components',
-      data: data
+      data: metadata
     });
     return css;
   };
@@ -74,8 +74,12 @@ function generateName(fileName) {
   return path.basename(fileName, '.css');
 }
 
-function generatePrefix(name, guid) {
-  return name + "-" + guid;
+function generatePrefix(name, guid, className) {
+  var parts = [name, guid];
+  if (className) {
+    parts.push(className);
+  }
+  return parts.join('-');
 }
 
 

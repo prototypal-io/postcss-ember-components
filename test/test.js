@@ -20,8 +20,8 @@ describe('postcss-ember-components', function() {
       { from: 'some/file/path/my-component.css' }
     ).then(function(result) {
       var data = result.messages[0].data;
-      expect(data.selectorMap['.foo']).to.equal('.'+data.prefix+'-foo');
-      expect(result.css).to.equal('.'+data.prefix+'-foo { color: red }');
+      expect(data.classes.foo).to.equal(data.componentClass+'-foo');
+      expect(result.css).to.equal('.'+data.componentClass+'-foo { color: red }');
       done();
     }).catch(function (error) {
       done(error);
@@ -64,16 +64,40 @@ describe('postcss-ember-components', function() {
                  { guid: 'abc123' }, done);
   });
 
+  it('handles conversion with multiple classes one selector', function(done) {
+    equalityTest('.foo .bar {' +
+                   'color: orange;' +
+                 '}',
+
+                 '.my-component-abc123-foo .my-component-abc123-bar {' +
+                   'color: orange;' +
+                 '}',
+
+                 { guid: 'abc123' }, done);
+  });
+
+  it('handles conversion with complex selectors classes', function(done) {
+    equalityTest('.foo:hover, .bar, a > .bar {' +
+                   'color: orange;' +
+                 '}',
+
+                 '.my-component-abc123-foo:hover, .my-component-abc123-bar, a > .my-component-abc123-bar {' +
+                   'color: orange;' +
+                 '}',
+
+                 { guid: 'abc123' }, done);
+  });
+
+
   it('returns the correct lookup object', function(done) {
     var input = '.foo { color: pink; } .bar { color: black; }';
     postcss([ plugin({ guid: 'abc123' }) ]).process(input, { from: 'some/file/path/my-component.css' }).then(function (result) {
       expect(result.messages[0].data).to.deep.equal({
-        guid: 'abc123',
         name: 'my-component',
-        prefix: 'my-component-abc123',
-        selectorMap: {
-          '.foo': '.my-component-abc123-foo',
-          '.bar': '.my-component-abc123-bar'
+        componentClass: 'my-component-abc123',
+        classes: {
+          'foo': 'my-component-abc123-foo',
+          'bar': 'my-component-abc123-bar'
         }
       });
       done();
